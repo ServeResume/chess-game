@@ -1,11 +1,19 @@
 import React, { Component } from 'react';
+import ChessBoard from './components/ChessBoard';
+import { SizeMe } from 'react-sizeme';
 
 class App extends Component {
   render() {
     return (
-      <div>
-        Clean application
-      </div>
+      <SizeMe>
+        {({ size }) => (
+          <ChessBoard
+            primaryColor={'#EEE'}
+            secondaryColor={'#333'}
+            wrapperWidth={size.width || -1}
+          />
+        )}
+      </SizeMe>
     );
   }
 }
