@@ -1,6 +1,8 @@
 import React from 'react';
 import range from 'lodash/range';
+import io from 'socket.io-client';
 import ChessGame from '../../components/ChessGame';
+import getQueryParameterByName from '../../utils/getQueryParameterByName';
 
 const currentPlayer = 'white';
 const pieces = [
@@ -36,6 +38,19 @@ class ChessGameContainer extends React.Component {
   state = {
     clickedPosition: null,
   };
+
+  componentDidMount() {
+    const userToken = getQueryParameterByName('userToken');
+    const gameId = getQueryParameterByName('gameId');
+
+    console.log('userToken', userToken, gameId);
+
+    io(`http://localhost:4000/game/${gameId}`, {
+      query: {
+        userToken,
+      }
+    });
+  }
 
   onPositionClick = ({ x, y }) => {
     const piece = pieces[x][y];
