@@ -31,6 +31,9 @@ const ChessBoard = ({
   wrapperWidth,
   renderAtPosition,
   reverseBoard,
+  onPositionClick,
+  isPositionActive,
+  activeColor,
 }) => (
   <Wrapper
     reverseBoard={reverseBoard}
@@ -45,11 +48,14 @@ const ChessBoard = ({
             style={{ height: wrapperWidth/8 }}
             reverseBoard={reverseBoard}
             background={
-              getBoxBackground({
-                primaryColor,
-                secondaryColor,
-              }, { x, y })
+              isPositionActive({ x, y }) ?
+                activeColor :
+                getBoxBackground({
+                  primaryColor,
+                  secondaryColor,
+                }, { x, y })
             }
+            onClick={(e) => onPositionClick({ x, y }, e)}
           >
             {renderAtPosition({ x, y })}
           </Box>
@@ -60,11 +66,14 @@ const ChessBoard = ({
 );
 
 ChessBoard.propTypes = {
+  activeColor: PropTypes.string.isRequired,
   wrapperWidth: PropTypes.number.isRequired,
   primaryColor: PropTypes.string.isRequired,
   secondaryColor: PropTypes.string.isRequired,
   renderAtPosition: PropTypes.func.isRequired,
   reverseBoard: PropTypes.bool.isRequired,
+  onPositionClick: PropTypes.func.isRequired,
+  isPositionActive: PropTypes.func.isRequired,
 };
 
 export default ChessBoard;
