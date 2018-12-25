@@ -4,6 +4,7 @@ import range from 'lodash/range';
 import styled from 'styled-components';
 
 const Wrapper = styled.div`
+  ${props => props.reverseBoard && `transform: rotateX(180deg);`}
 `;
 
 const Row = styled.div`
@@ -16,6 +17,7 @@ const Box = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  ${props => props.reverseBoard && `transform: rotateX(180deg);`}
 `;
 
 const getBoxBackground = ({ primaryColor, secondaryColor }, { x, y }) => [
@@ -28,8 +30,11 @@ const ChessBoard = ({
   secondaryColor,
   wrapperWidth,
   renderAtPosition,
+  reverseBoard,
 }) => (
-  <Wrapper>
+  <Wrapper
+    reverseBoard={reverseBoard}
+  >
     {range(8).map(x => (
       <Row
         key={x}
@@ -38,6 +43,7 @@ const ChessBoard = ({
           <Box
             key={y}
             style={{ height: wrapperWidth/8 }}
+            reverseBoard={reverseBoard}
             background={
               getBoxBackground({
                 primaryColor,
@@ -58,6 +64,7 @@ ChessBoard.propTypes = {
   primaryColor: PropTypes.string.isRequired,
   secondaryColor: PropTypes.string.isRequired,
   renderAtPosition: PropTypes.func.isRequired,
+  reverseBoard: PropTypes.bool.isRequired,
 };
 
 export default ChessBoard;

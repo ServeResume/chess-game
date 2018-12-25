@@ -4,6 +4,7 @@ import range from 'lodash/range';
 import ChessBoard from '../ChessBoard';
 import ChessPiece from '../ChessPiece';
 
+const currentPlayer = 'white';
 const pieces = [
   [
     { name: 'rook', color: 'black' },
@@ -58,6 +59,7 @@ class ChessGame extends React.Component {
       <SizeMe>
         {({ size }) => (
           <ChessBoard
+            reverseBoard={currentPlayer === 'black'}
             primaryColor={'#EEEED5'}
             secondaryColor={'#7D955D'}
             wrapperWidth={size.width || -1}
