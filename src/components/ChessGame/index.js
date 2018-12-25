@@ -1,76 +1,12 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { SizeMe } from 'react-sizeme';
-import range from 'lodash/range';
 import ChessBoard from '../ChessBoard';
 import ChessPiece from '../ChessPiece';
 
-const currentPlayer = 'white';
-const pieces = [
-  [
-    { name: 'rook', color: 'black' },
-    { name: 'knight', color: 'black' },
-    { name: 'bishop', color: 'black' },
-    { name: 'queen', color: 'black' },
-    { name: 'king', color: 'black' },
-    { name: 'bishop', color: 'black' },
-    { name: 'knight', color: 'black' },
-    { name: 'rook', color: 'black' },
-  ],
-  range(8).map(_ => ({ name: 'pawn', color: 'black' })),
-  [],
-  [],
-  [],
-  [],
-  range(8).map(_ => ({ name: 'pawn', color: 'white' })),
-  [
-    { name: 'rook', color: 'white' },
-    { name: 'knight', color: 'white' },
-    { name: 'bishop', color: 'white' },
-    { name: 'queen', color: 'white' },
-    { name: 'king', color: 'white' },
-    { name: 'bishop', color: 'white' },
-    { name: 'knight', color: 'white' },
-    { name: 'rook', color: 'white' },
-  ],
-];
-
 class ChessGame extends React.Component {
-  state = {
-    clickedPosition: null,
-  };
-
-  onPositionClick = ({ x, y }) => {
-    const piece = pieces[x][y];
-
-    if (this.equalPositions(this.state.clickedPosition, { x, y })) {
-      this.setState({
-        clickedPosition: null,
-      })
-    }
-    else if(this.state.clickedPosition) {
-      this.movePiece(this.state.clickedPosition, { x, y });
-      this.setState({ clickedPosition: null });
-    }
-    else if(piece) {
-      this.setState({
-        clickedPosition: { x, y },
-      });
-    }
-  }
-
-  movePiece = (fromPosition, toPosition) => {
-    console.log('Moving piece', fromPosition, toPosition);
-  }
-
-  equalPositions = (p1, p2) =>
-    p1 && p2 && p1.x === p2.x && p1.y === p2.y;
-
-  isPositionActive = (position) => {
-    return this.equalPositions(this.state.clickedPosition, position);
-  };
-
   renderAtPosition = (wrapperWidth, { x, y }) => {
-    const piece = pieces[x][y];
+    const piece = this.props.pieces[x][y];
 
     if (!piece) {
       return null;
@@ -88,6 +24,11 @@ class ChessGame extends React.Component {
   }
 
   render() {
+    const {
+      currentPlayer,
+      onPositionClick,
+      isPositionActive,
+    } = this.props;
     return (
       <SizeMe>
         {({ size }) => (
@@ -98,8 +39,8 @@ class ChessGame extends React.Component {
             wrapperWidth={size.width || -1}
             renderAtPosition={(...args) =>
               this.renderAtPosition(size.width, ...args)}
-            onPositionClick={this.onPositionClick}
-            isPositionActive={this.isPositionActive}
+            onPositionClick={onPositionClick}
+            isPositionActive={isPositionActive}
             activeColor={'#BDCA5F'}
           />
         )}
@@ -107,5 +48,19 @@ class ChessGame extends React.Component {
     );
   }
 }
+
+ChessGame.propTypes = {
+  currentPlayer: PropTypes.string.isRequired,
+  onPositionClick: PropTypes.func.isRequired,
+  isPositionActive: PropTypes.func.isRequired,
+  pieces: PropTypes.arrayOf(
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        color: PropTypes.string.isRequired,
+      }),
+    ),
+  ).isRequired,
+};
 
 export default ChessGame;
