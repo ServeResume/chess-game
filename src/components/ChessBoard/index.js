@@ -13,6 +13,9 @@ const Row = styled.div`
 const Box = styled.div`
   flex: 0 0 ${100 / 8}%;
   background: ${props => props.background};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;
 
 const getBoxBackground = ({ primaryColor, secondaryColor }, { x, y }) => [
@@ -24,6 +27,7 @@ const ChessBoard = ({
   primaryColor,
   secondaryColor,
   wrapperWidth,
+  renderAtPosition,
 }) => (
   <Wrapper>
     {range(8).map(x => (
@@ -40,7 +44,9 @@ const ChessBoard = ({
                 secondaryColor,
               }, { x, y })
             }
-          />
+          >
+            {renderAtPosition({ x, y })}
+          </Box>
         ))}
       </Row>
     ))}
@@ -51,6 +57,7 @@ ChessBoard.propTypes = {
   wrapperWidth: PropTypes.number.isRequired,
   primaryColor: PropTypes.string.isRequired,
   secondaryColor: PropTypes.string.isRequired,
+  renderAtPosition: PropTypes.func.isRequired,
 };
 
 export default ChessBoard;
