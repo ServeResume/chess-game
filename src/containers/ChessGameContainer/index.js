@@ -43,8 +43,6 @@ class ChessGameContainer extends React.Component {
     const userToken = getQueryParameterByName('userToken');
     const gameId = getQueryParameterByName('gameId');
 
-    console.log('userToken', userToken, gameId);
-
     io(`http://localhost:4000/game/${gameId}`, {
       query: {
         userToken,
