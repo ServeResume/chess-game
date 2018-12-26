@@ -29,11 +29,30 @@ io.of(/game\/[0-9]+/).on('connection', function(socket) {
     gameRepository.save(game);
   }
 
-  if (!game.hasPlayer(userId)) {
-    game.addPlayerId(userId);
+  try {
+    if (!game.hasPlayer(userId)) {
+      game.addPlayerId(userId);
+    }
+  } catch(err) {
+    socket.emit('error_message', { message: err.message });
   }
 
-  console.log(game.getPlayerColor(userId));
+  socket.emit('init', {
+    playerColor: game.getPlayerColor(userId),
+    pieces: game.getPieces(),
+  });
+
+  socket.on('movePiece', ({ fromPosition, toPosition }) => {
+    try {
+      game.movePiece(fromPosition, toPosition, userId);
+    } catch(err) {
+      socket.emit('error_message', { message: err.message });
+    }
+
+    socket.nsp.emit('update', {
+      pieces: game.getPieces(),
+    })
+  });
 });
 
 http.listen(4000, function(){

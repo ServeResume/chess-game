@@ -1,57 +1,48 @@
 import React from 'react';
-import range from 'lodash/range';
 import io from 'socket.io-client';
 import ChessGame from '../../components/ChessGame';
 import getQueryParameterByName from '../../utils/getQueryParameterByName';
 
-const currentPlayer = 'white';
-const pieces = [
-  [
-    { name: 'rook', color: 'black' },
-    { name: 'knight', color: 'black' },
-    { name: 'bishop', color: 'black' },
-    { name: 'queen', color: 'black' },
-    { name: 'king', color: 'black' },
-    { name: 'bishop', color: 'black' },
-    { name: 'knight', color: 'black' },
-    { name: 'rook', color: 'black' },
-  ],
-  range(8).map(_ => ({ name: 'pawn', color: 'black' })),
-  [],
-  [],
-  [],
-  [],
-  range(8).map(_ => ({ name: 'pawn', color: 'white' })),
-  [
-    { name: 'rook', color: 'white' },
-    { name: 'knight', color: 'white' },
-    { name: 'bishop', color: 'white' },
-    { name: 'queen', color: 'white' },
-    { name: 'king', color: 'white' },
-    { name: 'bishop', color: 'white' },
-    { name: 'knight', color: 'white' },
-    { name: 'rook', color: 'white' },
-  ],
-];
-
 class ChessGameContainer extends React.Component {
   state = {
     clickedPosition: null,
+    playerColor: null,
+    pieces: [],
+    errorMessage: null,
   };
 
   componentDidMount() {
     const userToken = getQueryParameterByName('userToken');
     const gameId = getQueryParameterByName('gameId');
 
-    io(`http://localhost:4000/game/${gameId}`, {
+    this.socket = io(`http://localhost:4000/game/${gameId}`, {
       query: {
         userToken,
       }
     });
+
+    this.socket.on('init', ({ pieces, playerColor }) => {
+      this.setState({
+        pieces,
+        playerColor,
+      });
+    })
+
+    this.socket.on('update', ({ pieces }) => {
+      this.setState({
+        pieces,
+      });
+    })
+
+    this.socket.on('error_message', ({ message }) => {
+      this.setState({
+        errorMessage: message,
+      });
+    })
   }
 
   onPositionClick = ({ x, y }) => {
-    const piece = pieces[x][y];
+    const piece = this.state.pieces[x][y];
 
     if (this.equalPositions(this.state.clickedPosition, { x, y })) {
       this.setState({
@@ -70,7 +61,10 @@ class ChessGameContainer extends React.Component {
   }
 
   movePiece = (fromPosition, toPosition) => {
-    console.log('Moving piece', fromPosition, toPosition);
+    this.socket.emit('movePiece', {
+      fromPosition,
+      toPosition,
+    });
   }
 
   equalPositions = (p1, p2) =>
@@ -81,13 +75,28 @@ class ChessGameContainer extends React.Component {
   };
 
   render() {
+    const {
+      playerColor,
+      pieces,
+      errorMessage,
+    } = this.state;
+
+    if (pieces.length === 0) {
+      return <div>Loading...</div>;
+    }
+
     return (
-      <ChessGame
-        pieces={pieces}
-        currentPlayer={currentPlayer}
-        isPositionActive={this.isPositionActive}
-        onPositionClick={this.onPositionClick}
-      />
+      <div>
+        <ChessGame
+          pieces={pieces}
+          currentPlayer={playerColor}
+          isPositionActive={this.isPositionActive}
+          onPositionClick={this.onPositionClick}
+        />
+        {errorMessage && (
+          <div>{errorMessage}</div>
+        )}
+      </div>
     );
   }
 }
